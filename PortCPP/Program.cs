@@ -16,8 +16,10 @@ class Program
     public delegate void FuncNoReturn(int status);
 
     // Import the dataProcess function from the DLL
-    [DllImport("data_process.dll", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr dataProcess(FuncNoReturn fn, string data, UIntPtr size);
+    //[DllImport("data_process.dll", CallingConvention = CallingConvention.Cdecl)]
+    //public static extern IntPtr dataProcess(FuncNoReturn fn, string data, UIntPtr size);
+
+    public delegate IntPtr DataProcessDelegate(FuncNoReturn fn, string data, UIntPtr size);
 
     static void Main()
     {
@@ -33,6 +35,18 @@ class Program
         // Call the dataProcess function
         string inputData = "Hello, World!";
         UIntPtr size = new UIntPtr((uint)inputData.Length);
+        //IntPtr resultPtr = dataProcess(callback, inputData, size);
+
+        // Load the native library
+        IntPtr libraryHandle = NativeLibrary.Load("libdata_process.dll");
+
+        // Get the function pointer for the native function
+        IntPtr functionPointer = NativeLibrary.GetExport(libraryHandle, "dataProcess");
+
+        // Create a delegate for the native function
+        DataProcessDelegate dataProcess = Marshal.GetDelegateForFunctionPointer<DataProcessDelegate>(functionPointer);
+
+        // Call the native function using the delegate
         IntPtr resultPtr = dataProcess(callback, inputData, size);
 
         // Marshal the result back to managed code
@@ -46,5 +60,8 @@ class Program
         // Clean up
         Marshal.FreeHGlobal(result.data);
         Marshal.FreeHGlobal(resultPtr);
+
+        // Free the library when done
+        NativeLibrary.Free(libraryHandle);
     }
 }
