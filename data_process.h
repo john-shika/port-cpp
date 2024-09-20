@@ -1,13 +1,18 @@
 #pragma once
 
+#include <cstdio>
+#include <cstdlib>
+#include <cstdbool>
+#include <cstdint>
+
 #if defined(_WIN32) || defined(_WIN64)
-#ifdef DATAPROCESS_EXPORTS
-#define DATAPROCESS_API __declspec(dllexport)
+#ifdef DATA_PROCESS_EXPORTS
+#define DATA_PROCESS_API __declspec(dllexport)
 #else
-#define DATAPROCESS_API __declspec(dllimport)
+#define DATA_PROCESS_API __declspec(dllimport)
 #endif
 #else
-#define DATAPROCESS_API
+#define DATA_PROCESS_API
 #endif
 
 extern "C" {
@@ -18,5 +23,5 @@ extern "C" {
         size_t size;
     } data_t;
 
-    DATAPROCESS_API data_t* dataProcess(FuncNoReturn fn, const char* data, size_t size);
+    DATA_PROCESS_API data_t* dataProcess(FuncNoReturn fn, const char* data, size_t size);
 }
